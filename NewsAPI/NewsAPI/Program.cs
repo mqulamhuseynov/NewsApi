@@ -2,6 +2,10 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using NewsAPI.Data;
+using NewsAPI.Repository.Implementations;
+using NewsAPI.Repository.Interfaces;
+using NewsAPI.Service.Implementations;
+using NewsAPI.Service.Interfaces;
 
 namespace NewsAPI
 {
@@ -17,13 +21,15 @@ namespace NewsAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             
+            //DotNetEnv 
             Env.Load();
-            //db
+            //db DATABASE .env faylinnan gelir
             var connectionString = Environment.GetEnvironmentVariable("DATABASE");
             builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(connectionString)); 
 
             //service repo 
-
+            builder.Services.AddScoped<INewsRepository, NewsRepository>();
+            builder.Services.AddScoped<INewsService, NewsService>();
 
             //cors
             var cors = Environment.GetEnvironmentVariable("CORS");
@@ -49,7 +55,6 @@ namespace NewsAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
