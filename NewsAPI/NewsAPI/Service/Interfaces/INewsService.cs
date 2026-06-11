@@ -9,5 +9,7 @@ namespace NewsAPI.Service.Interfaces
         Task<IEnumerable<EditorPickDTO>> GetEditorPick();
         Task<LiveArticleDTO> GetLiveArticle();
         Task<(IEnumerable<ArticleListItemDTO> Items, int TotalCount)> GetArticles(string tab, int page, int limit);
+        Task<ArticleDetailDTO> GetArticleDetail(int id);
+        Task<IEnumerable<RelatedArticleDTO>> GetRelatedArticles(int id, int limit);
     }
 }

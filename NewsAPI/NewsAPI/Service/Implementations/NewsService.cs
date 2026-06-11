@@ -12,6 +12,50 @@ namespace NewsAPI.Service.Implementations
         {
             _newsRepository = newsRepository;
         }
+
+        public async Task<ArticleDetailDTO> GetArticleDetail(int id)
+        {
+            var article = await _newsRepository.GetArticleDetail(id);
+            if (article == null) throw new KeyNotFoundException($"Article with ID-{id} not found");
+
+            return new ArticleDetailDTO
+            {
+             Id = article.Id,
+             Title = article.Title,
+             ShortDescription = article.ShortDescription,
+             ImageUrl = article.ImageUrl,
+             Content = article.Content,
+             CreatedAt = article.CreatedAt,
+             ReadTimeMinutes = article.ReadTimeMinutes,
+             IsTrending = article.IsTrending,
+             IsBreaking = article.IsBreaking,
+             IsLive = article.IsLive,
+                Category = new CategoryDTO
+                {
+                    Id = article.Category.Id,
+                    Name = article.Category.Name,
+                    Slug = article.Category.Slug,
+                    BadgeColor = article.Category.BadgeColor
+                },
+                Author = new ArticleDetailAuthorDTO
+                {
+                    Id = article.Author.Id,
+                    Name = article.Author.Name,
+                    Bio = article.Author.Bio,
+                    AvatarUrl = article.Author.AvatarUrl,
+                    TwitterHandle = article.Author.TwitterHandle
+
+                },
+                Stats = new ArticleDetailStatsDTO
+                {
+                    LikesCount = article.ArticleStats.Likes,
+                    CommentsCount = article.ArticleStats.Comments,
+                    BookmarksCount = article.ArticleStats.Bookmarks,
+                    SharesCount = article.ArticleStats.Shares
+                }
+            };
+
+        }
         public async Task<(IEnumerable<ArticleListItemDTO> Items, int TotalCount)> GetArticles(string tab, int page, int limit)
         {
             if(page < 1) throw new ArgumentException("Page number must be greater than 0", nameof(page));
@@ -145,6 +189,35 @@ namespace NewsAPI.Service.Implementations
                     Name = article.Category.Name
                 }
             };
+        }
+
+        public async Task<IEnumerable<RelatedArticleDTO>> GetRelatedArticles(int id, int limit = 5)
+        {
+            var article = await _newsRepository.GetArticleDetail(id);
+            if (article == null) throw new KeyNotFoundException($"Article with ID-{id} not found");
+
+            var relatedArticles = await _newsRepository.GetRelatedArticles(article.CategoryId, id, limit);
+
+            return relatedArticles.Select(a => new RelatedArticleDTO
+            {
+                Id = a.Id,
+                Title = a.Title,
+                ShortDescription = a.ShortDescription,
+                ImageUrl = a.ImageUrl,
+                Category = new RelatedCategoryDTO
+                {
+                    Id = a.Category.Id,
+                    Name = a.Category.Name,
+                    BadgeColor = a.Category.BadgeColor
+                },
+                Stats = new StatsDTO
+                {
+                    LikesCount = a.ArticleStats.Likes,
+                    CommentsCount = a.ArticleStats.Comments,
+                    BookmarksCount = a.ArticleStats.Bookmarks
+                }
+
+            });
         }
     }
 }

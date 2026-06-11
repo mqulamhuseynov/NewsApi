@@ -94,5 +94,34 @@ namespace NewsAPI.Controllers
                 return NotFound(ApiResponse<LiveArticleDTO>.Fail(ex.Message));
             }
         }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetArticleDetail(int id) 
+        {
+            try
+            {
+                var article = await _newsService.GetArticleDetail(id);
+                return Ok(ApiResponse<ArticleDetailDTO>.Ok(article));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ApiResponse<ArticleDetailDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpGet("{id:int}/related")]
+        public async Task<IActionResult> RelatedArticles(int id)
+        {
+            try
+            {
+                var articles = await _newsService.GetRelatedArticles(id, 5);
+                return Ok(ApiResponse<IEnumerable<RelatedArticleDTO>>.Ok(articles));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponse<IEnumerable<RelatedArticleDTO>>.Fail(ex.Message));
+            }
+        }
+
     }
 }

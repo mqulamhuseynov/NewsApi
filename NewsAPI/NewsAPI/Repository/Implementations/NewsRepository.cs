@@ -73,5 +73,24 @@ namespace NewsAPI.Repository.Implementations
                 .ToListAsync();
         }
 
+        public async Task<Article> GetArticleDetail(int id)
+        {
+            return await _context.Articles
+                .Include(a => a.Category)
+                .Include(a => a.Author)
+                .Include(a => a.ArticleStats)
+                .FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<IEnumerable<Article>> GetRelatedArticles(int categoryId, int excludeId, int limit)
+        {
+            return await _context.Articles
+                .Include(a => a.Category)
+                .Include(a => a.ArticleStats)
+                .Where(a => a.CategoryId == categoryId && a.Id != excludeId)
+                .OrderByDescending(a => a.CreatedAt)
+                .Take(limit)
+                .ToListAsync();
+        }
     }
 }

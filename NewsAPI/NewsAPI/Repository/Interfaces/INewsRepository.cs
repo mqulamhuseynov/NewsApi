@@ -10,5 +10,7 @@ namespace NewsAPI.Repository.Interfaces
         Task<(IEnumerable<Article> Items, int TotalCount)> GetArticlesAsync(string tab, int page, int limit);
         Task<Article> GetLiveAsync();
         Task<IEnumerable<Article>> GetEditorsPicksAsync();
+        Task<Article> GetArticleDetail(int id);
+        Task<IEnumerable<Article>> GetRelatedArticles(int categoryId, int excludeId, int limit);
     }
 }
